@@ -7,7 +7,7 @@ pico_sdk_init()
 add_executable(chip8_pico
     main.c
 )
-target_link_libraries(chip8_pico pico_stdlib)
+target_link_libraries(chip8_pico pico_stdlib hardware_spi)
 pico_enable_stdio_usb(chip8_pico 1)
 pico_enable_stdio_uart(chip8_pico 0)
 pico_add_extra_outputs(chip8_pico)

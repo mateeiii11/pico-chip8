@@ -8,11 +8,10 @@
 #include <hardware/spi.h>
 #include "ili9341_init.h"
 #include "../../../chip8.h"
-#include "ibm_logo.h"
 #include "../../../pong_data.h"
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
+
 
 void send_comm(uint8_t a)
 {
@@ -44,10 +43,9 @@ void init_cmds()
 }
 void init_gp()
 {
-    spi_init(spi0, 5000000);
+    spi_init(spi0, 3000000);
     gpio_set_function(SDI, GPIO_FUNC_SPI);
     gpio_set_function(SCK, GPIO_FUNC_SPI);
-    gpio_set_function(SDO, GPIO_FUNC_SPI);
 
     gpio_init(CS);
     gpio_init(DC);
@@ -107,24 +105,46 @@ int main()
 {
     stdio_init_all();
     const uint LED_PIN = PICO_DEFAULT_LED_PIN;
-    const uint BUTTON_LEFT_UP = 15;
+    const uint BUTTON_LEFT_UP = 5;
+    const uint BUTTON_LEFT_DOWN = 4;
+    const uint BUTTON_RIGHT_UP = 3;
+    const uint BUTTON_RIGHT_DOWN = 2;
     uint8_t previousScreen[SCREEN_WIDTH * SCREEN_HEIGHT];
     chip8_t chip8;
+
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
+
     gpio_init(BUTTON_LEFT_UP);
     gpio_set_dir(BUTTON_LEFT_UP, GPIO_IN);
     gpio_pull_up(BUTTON_LEFT_UP);
+
+    gpio_init(BUTTON_LEFT_DOWN);
+    gpio_set_dir(BUTTON_LEFT_DOWN, GPIO_IN);
+    gpio_pull_up(BUTTON_LEFT_DOWN);
+    
+    gpio_init(BUTTON_RIGHT_UP);
+    gpio_set_dir(BUTTON_RIGHT_UP, GPIO_IN);
+    gpio_pull_up(BUTTON_RIGHT_UP);
+    
+    gpio_init(BUTTON_RIGHT_DOWN);
+    gpio_set_dir(BUTTON_RIGHT_DOWN, GPIO_IN);
+    gpio_pull_up(BUTTON_RIGHT_DOWN);
+    
     init_gp();
     init_cmds();
     set_screen_color();
+    
     memset(previousScreen, 0, sizeof(previousScreen));
     chip8_init(&chip8);
     chip8_load_rom(&chip8, pong_rom, pong_rom_size);
+
     uint32_t lastUpdate = to_ms_since_boot(get_absolute_time());
+
     while(1)
     {
         gpio_put(LED_PIN, 1);
+
         uint32_t currentTime = to_ms_since_boot(get_absolute_time());
         if(currentTime - lastUpdate >= 16)
         {
@@ -134,7 +154,9 @@ int main()
                 chip8.timer_sound--;
             lastUpdate = currentTime;
         }
+
         chip8_cycle(&chip8);
+
         for(int y = 0; y < SCREEN_HEIGHT; y++)
             for(int x = 0; x < SCREEN_WIDTH; x++)
             {
@@ -165,7 +187,9 @@ int main()
                 
                 
             }
+
         memcpy(previousScreen, chip8.screen, sizeof(previousScreen));
+        
         if(gpio_get(BUTTON_LEFT_UP) == 0)
         {
             chip8.keys[0x1] = 1;
@@ -174,6 +198,34 @@ int main()
         {
             chip8.keys[0x1] = 0;
         }
+
+        if(gpio_get(BUTTON_LEFT_DOWN) == 0)
+        {
+            chip8.keys[0x4] = 1;
+        }
+        else
+        {
+            chip8.keys[0x4] = 0;
+        }
+
+        if(gpio_get(BUTTON_RIGHT_UP) == 0)
+        {
+            chip8.keys[0xC] = 1;
+        }
+        else
+        {
+            chip8.keys[0xC] = 0;
+        }
+
+        if(gpio_get(BUTTON_RIGHT_DOWN) == 0)
+        {
+            chip8.keys[0xD] = 1;
+        }
+        else
+        {
+            chip8.keys[0xD] = 0;
+        }
+        
 
     }
 

@@ -108,14 +108,12 @@ int main(int argc, char *argv[])
             }
             else if(map_key(event.key.keysym.sym) != -1 && event.type == SDL_KEYDOWN)
             {
-                printf("Type: %s, repeat: %d\n", event.type == SDL_KEYDOWN ? "DOWN" : "UP", event.key.repeat);
-                //printf("Key pressed down is %d\n", event.key.keysym.sym);
+                
                 chip8.keys[map_key(event.key.keysym.sym)] = 1;
             }
             else if(map_key(event.key.keysym.sym) != -1 && event.type == SDL_KEYUP)
             {
-                printf("Type: %s, repeat: %d\n", event.type == SDL_KEYDOWN ? "DOWN" : "UP", event.key.repeat);
-                //printf("Key pressed up is %d", event.key.keysym.sym);
+                
                 chip8.keys[map_key(event.key.keysym.sym)] = 0;
             }
         }

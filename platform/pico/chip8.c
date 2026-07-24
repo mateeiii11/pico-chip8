@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h> 
 #include <stdlib.h>
+#include <stdio.h>
 static const uint8_t chip8_fontset[80] = {
      0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -38,7 +39,6 @@ void chip8_load_rom(chip8_t *chip8, const uint8_t *rom_data, uint16_t rom_size)
 void chip8_cycle(chip8_t *chip8)
 {
     uint16_t opcode = (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc + 1];
-    
     switch(((opcode) & 0xF000) >> 12)
     {
         case 0x0:
@@ -253,6 +253,8 @@ void chip8_cycle(chip8_t *chip8)
                     chip8->pc += 2; 
                     break;
                 case 0x0A:
+                {
+                    printf("Waiting for key, V[%d]\n", x);
                     for(int i = 0; i < 16; i++)
                         if(chip8->keys[i] == 1)
                         {
@@ -261,6 +263,7 @@ void chip8_cycle(chip8_t *chip8)
                             break;
                         }
                     break;
+                }
                 default:
                     break;
             }

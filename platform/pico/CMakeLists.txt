@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 add_executable(chip8_pico
     main.c
+    chip8.c
 )
 target_link_libraries(chip8_pico pico_stdlib hardware_spi)
 pico_enable_stdio_usb(chip8_pico 1)
